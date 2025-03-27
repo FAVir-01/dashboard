@@ -1,159 +1,187 @@
-"use client"
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Chatbot</title>
 
-import type React from "react"
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-import { useState } from "react"
-import { useData } from "@/components/data-provider"
-import { updateSettings } from "@/lib/api"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Loader2 } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+  <!-- Configuração do Tailwind com as cores personalizadas -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            border: "hsl(var(--border))",
+            input: "hsl(var(--input))",
+            ring: "hsl(var(--ring))",
+            background: "hsl(var(--background))",
+            foreground: "hsl(var(--foreground))",
+            primary: {
+              DEFAULT: "hsl(var(--primary))",
+              foreground: "hsl(var(--primary-foreground))",
+            },
+            secondary: {
+              DEFAULT: "hsl(var(--secondary))",
+              foreground: "hsl(var(--secondary-foreground))",
+            },
+            destructive: {
+              DEFAULT: "hsl(var(--destructive))",
+              foreground: "hsl(var(--destructive-foreground))",
+            },
+            muted: {
+              DEFAULT: "hsl(var(--muted))",
+              foreground: "hsl(var(--muted-foreground))",
+            },
+            accent: {
+              DEFAULT: "hsl(var(--accent))",
+              foreground: "hsl(var(--accent-foreground))",
+            },
+            card: {
+              DEFAULT: "hsl(var(--card))",
+              foreground: "hsl(var(--card-foreground))",
+            },
+            popover: {
+              DEFAULT: "hsl(var(--popover))",
+              foreground: "hsl(var(--popover-foreground))",
+            },
+          },
+          borderRadius: {
+            lg: "var(--radius)",
+            md: "calc(var(--radius) - 2px)",
+            sm: "calc(var(--radius) - 4px)",
+          },
+        },
+      },
+    }
+  </script>
 
-export function SettingsForm() {
-  const { settings, refetchData } = useData()
-  const { toast } = useToast()
-  const [saving, setSaving] = useState(false)
-
-  // Get the first settings object or use default values
-  const defaultSettings = settings && settings.length > 0 ? settings[0] : null
-
-  const [formData, setFormData] = useState({
-    bot_name: defaultSettings?.bot_name || "Assistente",
-    link: defaultSettings?.link || "",
-    auto_reply: defaultSettings?.auto_reply === true,
-    working_hours_start: defaultSettings?.working_hours_start || "09:00",
-    working_hours_end: defaultSettings?.working_hours_end || "18:00",
-  })
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSwitchChange = (name: string, checked: boolean) => {
-    setFormData((prev) => ({ ...prev, [name]: checked }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!defaultSettings) {
-      toast({
-        title: "Erro",
-        description: "Não foi possível encontrar configurações para atualizar.",
-        variant: "destructive",
-      })
-      return
+  <!-- Estilos base -->
+  <style>
+    :root {
+      --background: 0 0% 100%;
+      --foreground: 222.2 84% 4.9%;
+      --card: 0 0% 100%;
+      --card-foreground: 222.2 84% 4.9%;
+      --popover: 0 0% 100%;
+      --popover-foreground: 222.2 84% 4.9%;
+      --primary: 222.2 47.4% 11.2%;
+      --primary-foreground: 210 40% 98%;
+      --secondary: 210 40% 96.1%;
+      --secondary-foreground: 222.2 47.4% 11.2%;
+      --muted: 210 40% 96.1%;
+      --muted-foreground: 215.4 16.3% 46.9%;
+      --accent: 210 40% 96.1%;
+      --accent-foreground: 222.2 47.4% 11.2%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 214.3 31.8% 91.4%;
+      --input: 214.3 31.8% 91.4%;
+      --ring: 222.2 84% 4.9%;
+      --radius: 0.5rem;
     }
 
-    setSaving(true)
-
-    try {
-      await updateSettings(686, defaultSettings.id, formData)
-      toast({
-        title: "Sucesso",
-        description: "Configurações atualizadas com sucesso.",
-      })
-      refetchData()
-    } catch (error) {
-      console.error("Erro ao salvar configurações:", error)
-      toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao salvar as configurações.",
-        variant: "destructive",
-      })
-    } finally {
-      setSaving(false)
+    .dark {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --card: 222.2 84% 4.9%;
+      --card-foreground: 210 40% 98%;
+      --popover: 222.2 84% 4.9%;
+      --popover-foreground: 210 40% 98%;
+      --primary: 210 40% 98%;
+      --primary-foreground: 222.2 47.4% 11.2%;
+      --secondary: 217.2 32.6% 17.5%;
+      --secondary-foreground: 210 40% 98%;
+      --muted: 217.2 32.6% 17.5%;
+      --muted-foreground: 215 20.2% 65.1%;
+      --accent: 217.2 32.6% 17.5%;
+      --accent-foreground: 210 40% 98%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 217.2 32.6% 17.5%;
+      --input: 217.2 32.6% 17.5%;
+      --ring: 212.7 26.8% 83.9%;
     }
-  }
+    
+    * {
+      border-color: hsl(var(--border));
+    }
+    
+    body {
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Configurações do Chatbot</CardTitle>
-        <CardDescription>Personalize as configurações do seu assistente virtual.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="bot_name">Nome do Bot</Label>
-              <Input
-                id="bot_name"
-                name="bot_name"
-                placeholder="Nome do assistente"
-                value={formData.bot_name}
-                onChange={handleChange}
-              />
-            </div>
+    /* Componentes UI básicos */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius);
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      transition: all 0.2s;
+    }
 
-            <div className="space-y-2">
-              <Label htmlFor="link">Link para Planos</Label>
-              <Input
-                id="link"
-                name="link"
-                placeholder="https://exemplo.com/planos"
-                value={formData.link}
-                onChange={handleChange}
-              />
-            </div>
+    .btn-ghost {
+      background-color: transparent;
+    }
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="auto_reply">Resposta Automática</Label>
-                <Switch
-                  id="auto_reply"
-                  checked={formData.auto_reply}
-                  onCheckedChange={(checked) => handleSwitchChange("auto_reply", checked)}
-                />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Habilitar respostas automáticas quando estiver fora do horário de trabalho
+    .btn-ghost:hover {
+      background-color: hsl(var(--muted));
+    }
+
+    .card {
+      border-radius: var(--radius);
+      border: 1px solid hsl(var(--border));
+      background-color: hsl(var(--card));
+      color: hsl(var(--card-foreground));
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+  </style>
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- React e ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div id="dashboard-root"></div>
+
+  <!-- Carrega o dashboard.js do mesmo diretório -->
+  <script src="dashboard.js"></script>
+  
+  <!-- Instruções para o cliente -->
+  <script>
+    // Verificar se o dashboard foi carregado corretamente
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        if (document.getElementById('dashboard-root').children.length === 0) {
+          document.getElementById('dashboard-root').innerHTML = `
+            <div style="max-width: 600px; margin: 100px auto; padding: 20px; text-align: center; font-family: system-ui, sans-serif;">
+              <h2 style="margin-bottom: 20px; color: #333;">O Dashboard não foi carregado corretamente</h2>
+              <p style="margin-bottom: 15px; color: #555; line-height: 1.5;">
+                Verifique se o arquivo dashboard.js está no mesmo diretório que este arquivo HTML.
               </p>
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="working_hours_start">Horário de Início</Label>
-                <Input
-                  id="working_hours_start"
-                  name="working_hours_start"
-                  type="time"
-                  value={formData.working_hours_start}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="working_hours_end">Horário de Término</Label>
-                <Input
-                  id="working_hours_end"
-                  name="working_hours_end"
-                  type="time"
-                  value={formData.working_hours_end}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-          </div>
-
-          <Button type="submit" className="mt-6" disabled={saving}>
-            {saving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              "Salvar Configurações"
-            )}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  )
-}
-
+          `;
+        }
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
